@@ -52,15 +52,34 @@ T supercast(F f)
 	ft.f = f;
 	return ft.t;  //超级转换
 }
+//
+//template<typename _ST,typename ..._Ts>
+//std::pair<std::string, uint64_t> getId(_ST* _OBJ_S, void(_ST::* _SIG)(_Ts...))
+//{
+//	long long object_s = (long long)_OBJ_S;
+//	long long funtion_s = (long long)supercast<void(*)(_Ts...)>(_SIG);
+//	
+//
+//	return { std::to_string(object_s) +=std::to_string(funtion_s) ,funtion_s };
+//}
+template<typename _ST, typename _RT, typename ..._Ts>
+std::pair<std::string, uint64_t>  GetId(_ST* _OBJ_S, void(_ST::* _SIG)(_Ts...), _RT* __OBJ_R=0x00, void(_RT::* _SLOT)(_Ts...) = 0x00) {
+
+	long long objs, signal_,objr,slot_;
+	objs= (long long)_OBJ_S;
+	signal_=(long long)supercast<void(*)(_Ts...)>(_SIG);
+	objr = (long long)__OBJ_R;
+	slot_=(long long)supercast<void(*)(_Ts...)>(_SLOT);
+
+	return { std::to_string(objs ^ signal_),objr ^ slot_ };
+}
 
 template<typename _ST, typename ..._Ts>
-std::pair<std::string, uint64_t> getId(_ST* _OBJ_S, void(_ST::* _SIG)(_Ts...)) {
-	long long object_s = (long long)_OBJ_S;
-	long long funtion_s = (long long)supercast<void(*)(_Ts...)>(_SIG);
-	/*std::string id = std::to_string(object_s);
-	id += std::to_string(funtion_s);*/
-
-	return { std::to_string(object_s) +=std::to_string(funtion_s) ,funtion_s };
+std::pair<std::string, uint64_t>  GetId(_ST* _OBJ_S, void(_ST::* _SIG)(_Ts...),uint64_t id_) {
+	long long objs, signal_;
+	objs = (long long)_OBJ_S;
+	signal_ = (long long)supercast<void(*)(_Ts...)>(_SIG);
+	return { std::to_string(objs ^ signal_) ,id_ };
 }
 
 
@@ -110,12 +129,17 @@ public:
 	}
 
 	void deleteSlot(uint64_t id) override{
-		for (auto e = all_slot.begin(); e != all_slot.end();) {
+		for (auto e = all_slot.begin(); e != all_slot.end(); ) {
 			if ((*e)->slot_id == id) {
 				slot_base*sl = (*e);
 				e=all_slot.erase(e);
 				delete sl;
+				return;
 			}
+			else {
+				e++;
+			}
+			
 		}
 	}
 
@@ -140,48 +164,45 @@ public:
 	
 	virtual ~PObject();
 
-	virtual void setPriority(slot_base * s) {
-		setEventPriority(s, (int)PEvent::CUSTM_FUNC);
-	}
+	
 
 
 	template<typename _ST, typename _RT, typename ..._Ts>
 	void disconnect(_ST* _OBJ_S, void(_ST::* _SIG)(_Ts...), _RT* __OBJ_R, void(_RT::* _SLOT)(_Ts...)) {
-		std::pair<std::string, uint64_t> id = getId(_OBJ_S, _SIG);
-		uninstallSlot(id);
+		std::pair<std::string, uint64_t> id = GetId(_OBJ_S, _SIG,__OBJ_R,_SLOT);
+		_OBJ_S->uninstallSlot(id);
 		
 	}
 
-	template<typename _ST, typename F, typename ...Ts>
-	void disconnect(_ST* _OBJ_S, void(_ST::* _SIG)(Ts...)) {
-		std::pair<std::string, uint64_t> id = getId(_OBJ_S, _SIG);
-		uninstallSlot(id);
+	template<typename _ST, typename ...Ts>
+	void disconnect(_ST* _OBJ_S, void(_ST::* _SIG)(Ts...),uint64_t id_) {
+		std::pair<std::string, uint64_t> id = GetId(_OBJ_S, _SIG,id_);
+		_OBJ_S->uninstallSlot(id);
 	}
 
 	template<typename _ST, typename _RT, typename ..._Ts>
 	 void connect(_ST* _OBJ_S,void(_ST::* _SIG)(_Ts...),_RT* __OBJ_R,void(_RT::* _SLOT)(_Ts...))
 	 {
-		 std::pair<std::string, uint64_t> id = getId(_OBJ_S, _SIG);
-
+		 std::pair<std::string, uint64_t> id = GetId(_OBJ_S, _SIG, __OBJ_R, _SLOT);
+		
 		slot < std::function<void(_Ts...)>, std::decay_t<_Ts>...>* slot_
 		= __OBJ_R->createSlot < std::function<void(_Ts...)>, std::decay_t<_Ts>...>(
 			std::forward< std::function<void(_Ts...)>>(Bind(_SLOT, __OBJ_R)),
 			id.second
 			);
 
-		private_connect<std::function<void(_Ts...)>,std::decay_t<_Ts>...>(id.first, slot_);
+		_OBJ_S->private_connect<std::function<void(_Ts...)>,std::decay_t<_Ts>...>(id.first, slot_);
 	}
 
 	template<typename _ST, typename F, typename ...Ts>
-	void connect(_ST* _OBJ_S,void(_ST::* _SIG)(Ts...),F &&f) 
+	void connect(_ST* _OBJ_S,void(_ST::* _SIG)(Ts...),uint64_t slot_id,F &&f) 
 	{
-		std::pair<std::string, uint64_t> id = getId(_OBJ_S, _SIG);
-		
+		std::pair<std::string, uint64_t> id = GetId(_OBJ_S, _SIG,slot_id);
 		
 		slot<std::function<void(Ts...)>, std::decay_t<Ts>...> * slot_ =
-			_OBJ_S->createSlot<std::function<void(Ts...)>, std::decay_t<Ts>...>(std::forward<F>(f),id.second);
+			_OBJ_S->createSlot<std::function<void(Ts...)>, std::decay_t<Ts>...>(std::forward<F>(f),slot_id);
 
-		private_connect<std::function<void(Ts...)>,std::decay_t<Ts>...>(id.first,slot_);
+		_OBJ_S->private_connect<std::function<void(Ts...)>,std::decay_t<Ts>...>(id.first,slot_);
 	}
 
 	template<typename F, typename... _Ts>
@@ -192,7 +213,9 @@ public:
 		return n_slot;
 	}
 protected:
-
+	virtual void setPriority(slot_base* s) {
+		setEventPriority(s, (int)PEvent::CUSTM_FUNC);
+	}
 
 
 	signal_base* getSignalObject(const std::string& _SIG);
@@ -219,7 +242,7 @@ protected:
 
 	template <typename _ST, typename ..._Ts>
 	void emit(_ST* object, void(_ST::* _SIG)(_Ts...), _Ts... args) {
-		std::pair<std::string, uint64_t> id = getId(object, _SIG);
+		std::pair<std::string, uint64_t> id = GetId(object, _SIG,0);
 		auto sobj = getSignalObject(id.first);
 		if (sobj != nullptr)
 		{
