@@ -61,21 +61,25 @@ public:
 	Widget() {
 		connect(this, &Widget::int_signal, this, &Widget::int_slot);
 
-		connect(this, &Widget::hello, [](std::string name, int age, bool sex) {
+		/*connect(this, &Widget::hello, [](std::string name, int age, bool sex) {
 			std::cout << "name:" << name << std::endl;
 			std::cout << "age:" << age << std::endl;
 			std::cout << "sex" << sex << std::endl;
-		});
+		});*/
+
+		connect(this, &Widget::helloWorld, this, &Widget::slot_hellWorld);
 		
 	}
 
 	
 	
-	_SIGNAL(Widget,hello,
+	_SIGNAL(Widget, helloWorld,
 	_ARGS(const std::string & name,int age,bool sex),
 	_ARGS(const std::string &,int,bool),
 	_ARGS(name,age,sex)
 	)
+
+	_SIGNAL_VOID(Widget,hello)
 
 	/*void hello(const std::string & name,int age,bool sex) {
 		emit<Widget,const std::string&,int,bool>(this, &Widget::hello, name, age, sex);
@@ -101,8 +105,8 @@ public:
 
 	//slot
 
-	void world(const std::string& msg,int b) {
-		std::cout << msg << "value:"  << b<< std::endl;
+	void world() {
+		std::cout <<  "world" << std::endl;
 	}
 
 	void int_slot(int bbl) {
@@ -111,6 +115,12 @@ public:
 		if (i < 10000) {
 			//int_signal(i++);
 		}
+	}
+
+	void slot_hellWorld(const std::string& name, int age, bool sex) {
+		infoL("name:" << name << "age:" << age
+			<< "sex:" << (sex ? "Woman" : "man")
+		)
 	}
 	
 	void print_str(int str) {
@@ -183,7 +193,7 @@ int main() {
 
 		widget->int_signal(45);
 
-		widget->hello("wangbl", 78, false);
+		widget->helloWorld("wangbl", 78, false);
 
 
 
@@ -194,6 +204,8 @@ int main() {
 		Button bt;
 
 		widget->connect(&bt, &Button::clicked, widget, &Widget::print_str);
+
+		bt.disconnect(&bt, &Button::void_test, &bt, &Button::void_slot);
 
 		bt.void_test();
 

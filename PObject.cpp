@@ -9,17 +9,8 @@ PObject::~PObject()
 		return ;
 	}
 
-	for (auto s : l_signal_slot) {
-		auto sig=__ALL_SIGNALS_.find(s.first);
-		if (sig!=__ALL_SIGNALS_.end()) {
-			auto sl = sig->second;
-			sl->deleteSlot(s.second);
-			if (sl->isEmpty()) {
-				__ALL_SIGNALS_.erase(s.first);
-				delete sl;
-			}
-			
-		}
+	for (auto s : __ALL_SIGNALS_) {
+		delete s.second;
 	}
 
 }
@@ -54,23 +45,18 @@ void PObject::addSignalObject(const std::string& _SIG, signal_base* obj)
 	}
 }
 
-void PObject::clearSignalObject(const std::string& _SIG)
-{
-	
 
-}
 
 void PObject::uninstallSlot(std::pair< std::string, uint64_t>& pa)
 {
 	
-	for (auto s = l_signal_slot.begin(); s != l_signal_slot.end(); s++) {
-		if ((*s).first == pa.first && (*s).second==pa.second) {
-			l_signal_slot.erase(s);
+	auto signal_ = __ALL_SIGNALS_.find(pa.first);
+	if (signal_ != __ALL_SIGNALS_.end()) {
+		signal_->second->deleteSlot(pa.second);
+		if (signal_->second->isEmpty()) {
+			__ALL_SIGNALS_.erase(signal_->first);
 		}
 	}
 }
 
-void PObject::installSlot(std::pair< std::string,uint64_t> & pa)
-{
-	l_signal_slot.push_back(pa);
-}
+

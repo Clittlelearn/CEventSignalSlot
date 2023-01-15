@@ -113,7 +113,7 @@ public:
 		for (auto e = all_slot.begin(); e != all_slot.end();) {
 			if ((*e)->slot_id == id) {
 				slot_base*sl = (*e);
-				all_slot.erase(e);
+				e=all_slot.erase(e);
 				delete sl;
 			}
 		}
@@ -148,9 +148,6 @@ public:
 	template<typename _ST, typename _RT, typename ..._Ts>
 	void disconnect(_ST* _OBJ_S, void(_ST::* _SIG)(_Ts...), _RT* __OBJ_R, void(_RT::* _SLOT)(_Ts...)) {
 		std::pair<std::string, uint64_t> id = getId(_OBJ_S, _SIG);
-		
-		signal<std::function<void(_Ts...)>, std::decay_t<_Ts>...>* slot_ = getSignalObject(id.first);
-		slot_->deleteSlot(id.second);
 		uninstallSlot(id);
 		
 	}
@@ -158,9 +155,6 @@ public:
 	template<typename _ST, typename F, typename ...Ts>
 	void disconnect(_ST* _OBJ_S, void(_ST::* _SIG)(Ts...)) {
 		std::pair<std::string, uint64_t> id = getId(_OBJ_S, _SIG);
-		
-		signal<std::function<void(Ts...)>, std::decay_t<Ts>...>* slot_ = getSignalObject(id.first);
-		slot_->deleteSlot(id.second);
 		uninstallSlot(id);
 	}
 
@@ -174,7 +168,7 @@ public:
 			std::forward< std::function<void(_Ts...)>>(Bind(_SLOT, __OBJ_R)),
 			id.second
 			);
-		installSlot(id);
+
 		private_connect<std::function<void(_Ts...)>,std::decay_t<_Ts>...>(id.first, slot_);
 	}
 
@@ -186,7 +180,7 @@ public:
 		
 		slot<std::function<void(Ts...)>, std::decay_t<Ts>...> * slot_ =
 			_OBJ_S->createSlot<std::function<void(Ts...)>, std::decay_t<Ts>...>(std::forward<F>(f),id.second);
-		installSlot(id);
+
 		private_connect<std::function<void(Ts...)>,std::decay_t<Ts>...>(id.first,slot_);
 	}
 
@@ -204,8 +198,6 @@ protected:
 	signal_base* getSignalObject(const std::string& _SIG);
 
 	void addSignalObject(const std::string& _SIG, signal_base* obj);
-
-	void clearSignalObject(const std::string& _SIG);
 
 	template<typename F, typename ..._Ts>
 	void private_connect(const std::string& _SIG, slot < F, std::decay_t<_Ts>...>* slot_t) {
@@ -241,10 +233,7 @@ protected:
 private:
 
 	void uninstallSlot(std::pair< std::string, uint64_t>& pa);
-	void installSlot(std::pair< std::string, uint64_t>& pa);
-
 	std::map<std::string, signal_base*> __ALL_SIGNALS_;
-	std::vector<std::pair<std::string, uint64_t>> l_signal_slot;
 	PObject* m_parent;
 
 };

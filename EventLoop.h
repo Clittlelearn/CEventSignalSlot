@@ -87,7 +87,6 @@ protected:
 		//std::queue<PEvent*> LoopEvent;
 		std::priority_queue<PEvent*, std::vector<PEvent*>, Event_compare> LoopEvent;
 
-		
 		std::thread::id work_id;
 		CAS spinLook;
 	};
