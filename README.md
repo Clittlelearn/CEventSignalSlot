@@ -39,13 +39,13 @@ public:
 
     /*
        I certainly know that these parameters are not handled elegantly enough
-        
+
     */
     _SIGNAL(Widget,person,
-	_ARGS(const std::string & name,int age,bool sex),
-	_ARGS(const std::string &,int,bool),
-	_ARGS(name,age,sex)
-	)
+    _ARGS(const std::string & name,int age,bool sex),
+    _ARGS(const std::string &,int,bool),
+    _ARGS(name,age,sex)
+    )
 };
 ```
 
@@ -62,24 +62,22 @@ public:
     _SIGNAL_VOID(Widget,hello)
 
     _SIGNAL(Widget,person,
-	_ARGS(const std::string & name,int age,bool sex),
-	_ARGS(const std::string &,int,bool),
-	_ARGS(name,age,sex)
-	)
+    _ARGS(const std::string & name,int age,bool sex),
+    _ARGS(const std::string &,int,bool),
+    _ARGS(name,age,sex)
+    )
 
     void world() {
-		std::cout <<  "world" << std::endl;
-	}
+        std::cout <<  "world" << std::endl;
+    }
 
     void person_slot(const std::string& name, int age, bool sex) {
-		infoL("name:" << name << "age:" << age
-			<< "sex:" << (sex ? "Woman" : "man")
-		)
-	}
+        infoL("name:" << name << "age:" << age
+            << "sex:" << (sex ? "Woman" : "man")
+        )
+    }
 }
 ```
-
-
 
 In the  main function:
 
@@ -90,7 +88,7 @@ int main(){
     widget.hello();
 
     widget.person("AAAA",23,false);
-    
+
     core.exec();
 
 }

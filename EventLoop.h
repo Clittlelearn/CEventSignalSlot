@@ -20,7 +20,7 @@ public:
 	virtual ~signal_base() {}
 	virtual void deleteSlot(uint64_t id) {}
 	virtual bool isEmpty() { return false; }
-	
+	CAS spinLock;
 
 };
 
@@ -57,6 +57,7 @@ public:
 	void addSelftToWorkThread();
 	void setPriority(int Priority_);
 	uint64_t slot_id;
+	
 };
 
 

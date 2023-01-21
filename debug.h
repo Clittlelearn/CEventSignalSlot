@@ -8,13 +8,14 @@
 #define RED_t "\033[31m"
 #define YELLOW_t "\033[33m"
 #define GREEN_t "\033[32m"
+#define WRITE "\033[0m"
 
 #define errorL(msg) \
-	std::cout << RED_t <<"Error:["<< __FILE__  << ":"<< __LINE__ << "]:"<< msg << std::endl;
+	std::cout << RED_t <<"Error:["<< __FILE__  << ":"<< __LINE__ << "]:"<< msg << WRITE <<std::endl;
 #define debugL(msg) \
-	std::cout << YELLOW_t <<"debug:["<< __FILE__ << ":"<< __LINE__ << "]:"<< msg << std::endl;
+	std::cout << YELLOW_t <<"debug:["<< __FILE__ << ":"<< __LINE__ << "]:"<< msg << WRITE << std::endl;
 #define infoL(msg) \
-	std::cout << GREEN_t <<"debug:["<< __FILE__ << ":" << __LINE__ << "]:"<< msg << std::endl;
+	std::cout << GREEN_t <<"debug:["<< __FILE__ << ":" << __LINE__ << "]:"<< msg << WRITE << std::endl;
 
 #define _S(n) std::to_string(n)
 

@@ -12,7 +12,7 @@
 #if _MSC_VER
 #define PlaceHolder std::_Ph
 #else
-#define PlaceHolder std::_Placeholder
+#define PlaceHolder std::placeholders::__ph
 #endif
 
 template<int N, int...I>
@@ -87,41 +87,55 @@ std::pair<std::string, uint64_t>  GetId(_ST* _OBJ_S, void(_ST::* _SIG)(_Ts...),u
 class PObject;
 
 template<typename F, typename... Ts>
-class slot :public slot_base {
+class PSlot :public slot_base {
 public:
-	slot(F&& f, uint64_t s_id) :f_(std::forward<F>(f)) {
+	PSlot(F&& f, uint64_t s_id) :f_(std::forward<F>(f)) {
 		slot_id = s_id;
 	}
 	
-	void setArgPtr(std::tuple<Ts...> * args_) {
+	void setArgPtr(std::queue<std::tuple<Ts...>> * args_) {
 		args = args_;
+	}
+
+	void setSignal(signal_base * sBase_){
+		sBase=sBase_;
 	}
 
 
 	void Invke()override {
-		std::apply(f_, *args);
+		auto arg=args->front();
+		sBase->spinLock.lock();
+		args->pop();
+		sBase->spinLock.unlock();
+		std::apply(f_, arg);
+		
 	}
 protected:
 	F f_;
-	std::tuple<Ts...>* args;
+	signal_base * sBase=nullptr;
+	std::queue<std::tuple<Ts...>>* args;
 };
 
 template<typename F, typename... _Ts>
-class signal :public signal_base
+class PSignal :public signal_base
 {
 public:
-	signal() { }
+	PSignal() { }
 	void setArgs(const std::tuple<_Ts...>&& args_t) {
-		_args = args_t;
+		spinLock.lock();
+		_args.push(args_t);
+		spinLock.unlock();
 	}
-	~signal() {
+	~PSignal() {
 		for (auto e : all_slot) {
 			delete e;
 		}
 	}
 
-	void addSlot(slot<F, _Ts...>* signal_t) {
-		all_slot.push_back(signal_t);
+	void addSlot(PSlot<F, _Ts...>* slot_t) {
+		
+		all_slot.push_back(slot_t);
+		slot_t->setSignal(this);
 	}
 
 	bool isEmpty()override {
@@ -145,13 +159,14 @@ public:
 
 	void emit() {
 		for (auto e : all_slot) {
-			static_cast<slot<F, _Ts...>*>( e )->setArgPtr(&_args);
+			static_cast<PSlot<F, _Ts...>*>( e )->setArgPtr(&_args);
 			e->addSelftToWorkThread();
 		}
 	}
 private:
+
 	std::vector<slot_base*> all_slot;
-	std::tuple<_Ts...> _args;
+	std::queue<std::tuple<_Ts...>> _args;
 
 };
 
@@ -185,13 +200,13 @@ public:
 	 {
 		 std::pair<std::string, uint64_t> id = GetId(_OBJ_S, _SIG, __OBJ_R, _SLOT);
 		
-		slot < std::function<void(_Ts...)>, std::decay_t<_Ts>...>* slot_
-		= __OBJ_R->createSlot < std::function<void(_Ts...)>, std::decay_t<_Ts>...>(
+		PSlot < std::function<void(_Ts...)>, std::decay_t<_Ts>...>* slot_
+		= __OBJ_R->template createSlot < std::function<void(_Ts...)>, std::decay_t<_Ts>...>(
 			std::forward< std::function<void(_Ts...)>>(Bind(_SLOT, __OBJ_R)),
 			id.second
 			);
 
-		_OBJ_S->private_connect<std::function<void(_Ts...)>,std::decay_t<_Ts>...>(id.first, slot_);
+		_OBJ_S->template private_connect<std::function<void(_Ts...)>,std::decay_t<_Ts>...>(id.first, slot_);
 	}
 
 	template<typename _ST, typename F, typename ...Ts>
@@ -199,15 +214,15 @@ public:
 	{
 		std::pair<std::string, uint64_t> id = GetId(_OBJ_S, _SIG,slot_id);
 		
-		slot<std::function<void(Ts...)>, std::decay_t<Ts>...> * slot_ =
-			_OBJ_S->createSlot<std::function<void(Ts...)>, std::decay_t<Ts>...>(std::forward<F>(f),slot_id);
+		PSlot<std::function<void(Ts...)>, std::decay_t<Ts>...> * slot_ =
+			_OBJ_S->template createSlot<std::function<void(Ts...)>, std::decay_t<Ts>...>(std::forward<F>(f),slot_id);
 
-		_OBJ_S->private_connect<std::function<void(Ts...)>,std::decay_t<Ts>...>(id.first,slot_);
+		_OBJ_S->template private_connect<std::function<void(Ts...)>,std::decay_t<Ts>...>(id.first,slot_);
 	}
 
 	template<typename F, typename... _Ts>
-	slot<F, std::decay_t<_Ts>...>* createSlot(F&& f,uint64_t sid) {
-		slot<F, std::decay_t<_Ts>...>* n_slot = new slot<F, std::decay_t<_Ts>...>(std::forward<F>(f),sid);
+	PSlot<F, std::decay_t<_Ts>...>* createSlot(F&& f,uint64_t sid) {
+		PSlot<F, std::decay_t<_Ts>...>* n_slot = new PSlot<F, std::decay_t<_Ts>...>(std::forward<F>(f),sid);
 		setSlotOf(n_slot);
 		setPriority(n_slot);
 		return n_slot;
@@ -223,17 +238,17 @@ protected:
 	void addSignalObject(const std::string& _SIG, signal_base* obj);
 
 	template<typename F, typename ..._Ts>
-	void private_connect(const std::string& _SIG, slot < F, std::decay_t<_Ts>...>* slot_t) {
+	void private_connect(const std::string& _SIG, PSlot < F, std::decay_t<_Ts>...>* slot_t) {
 		auto obj = getSignalObject(_SIG);
 
 		if (obj != nullptr) {
-			signal<F, std::decay_t<_Ts>...>* signal_t = static_cast<signal<F, std::decay_t<_Ts>...>*>(obj);
+			PSignal<F, std::decay_t<_Ts>...>* signal_t = static_cast<PSignal<F, std::decay_t<_Ts>...>*>(obj);
 			signal_t->addSlot(slot_t);
 
 		}
 		else {
 
-			signal<F, std::decay_t<_Ts>...>* signal_t = new signal< F, std::decay_t<_Ts>...>;
+			PSignal<F, std::decay_t<_Ts>...>* signal_t = new PSignal< F, std::decay_t<_Ts>...>;
 			signal_t->addSlot(slot_t);
 			addSignalObject(_SIG, signal_t);
 		}
@@ -246,8 +261,8 @@ protected:
 		auto sobj = getSignalObject(id.first);
 		if (sobj != nullptr)
 		{
-			signal< std::function<void(_Ts...)>,std::decay_t<_Ts>...>* signal_t =
-				static_cast<signal< std::function<void(_Ts...)>,std::decay_t<_Ts>...> *>(sobj);
+			PSignal< std::function<void(_Ts...)>,std::decay_t<_Ts>...>* signal_t =
+				static_cast<PSignal< std::function<void(_Ts...)>,std::decay_t<_Ts>...> *>(sobj);
 			signal_t->setArgs(std::tuple<std::decay_t<_Ts>...>(std::forward<_Ts>(args)...));
 			signal_t->emit();
 		}
@@ -275,7 +290,7 @@ public:
 
 
 #define _ARGS(...)\
-	 _ED(0) ##__VA_ARGS__ 
+	 _ED(0) __VA_ARGS__ 
 
 #define _SIGNAL(className,signalName,one,tow,three)\
 	void signalName(one){\
