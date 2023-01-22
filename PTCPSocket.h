@@ -19,6 +19,11 @@ class PTCPSocket:public PObject{
 public:
     PTCPSocket(int fd,PTCPServer * server=nullptr,PObject * parent=nullptr);
     ~PTCPSocket();
+
+    std::string getIp();
+
+    int getPort();
+
 SIGNAL_("read or write")
     /**
      * @brief 当数据来的信号

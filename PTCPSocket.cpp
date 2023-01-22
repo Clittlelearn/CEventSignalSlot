@@ -7,10 +7,23 @@ PTCPSocket::PTCPSocket(int fd,PTCPServer * server,PObject * parent):PObject(pare
     if(server==nullptr){
         m_server=new PTCPServer(10,this);
     }
+    m_server=server;
+}
+
+std::string PTCPSocket::getIp(){
+   // inet_aton(ip.c_str(),&serverAddr.sin_addr);
+   return std::string(inet_ntoa(Socketaddr.sin_addr));
+}
+
+int PTCPSocket::getPort(){
+    return ntohs(Socketaddr.sin_port);
 }
 
 PTCPSocket::~PTCPSocket(){
-
+    if(scfd!=0){
+        ::close(scfd);
+        scfd=0;
+    }
 }
 
  void PTCPSocket::send(const char * data,int size){
@@ -23,7 +36,13 @@ PTCPSocket::~PTCPSocket(){
  }
 
 int PTCPSocket::read(char * data,int size){
-    return ::read(scfd,data,size);
+    int ret= ::read(scfd,data,size);
+    if(ret==0){
+        m_server->deleteEvent(scfd,EVFILT_READ);
+        ::close(scfd);
+        scfd=0;
+    }
+    return ret;
 }
 
 PTCPServer::PTCPServer(int maxCheckEventSize,PObject * parent):PThread(parent){
@@ -69,14 +88,16 @@ bool PTCPServer::listen(int MaxListenSize){
         return false;
     }
     addEvent(listen_fd, EVFILT_READ|EVFILT_WRITE);
+    
     return true;
 }
 
 void PTCPServer::run(){
-    int ret = kevent(listen_fd, NULL, 0, checkeventList, MaxEventCheckSize, NULL);
+    int ret = kevent(kqueue_handle, NULL, 0, checkeventList, MaxEventCheckSize, NULL);
     if (ret < 0)
     {
         errorL("kevent:" << strerror(errno));
+        return;
     }
 
     for (int i = 0; i < ret; i++)
@@ -93,6 +114,7 @@ void PTCPServer::run(){
                 void * socketPtr=checkeventList[i].udata;
                 if(socketPtr==nullptr){
                     errorL("EVFILT_READ: no PTCPSocet pointer");
+                    ::sleep(1000);
                     continue;
                 }
                 PTCPSocket * Psocket=static_cast<PTCPSocket*>(socketPtr);
@@ -133,7 +155,7 @@ void PTCPServer::accept(struct kevent * ke){
         PTCPSocket * client_socket=new PTCPSocket(client_fd,this,this);
         client_socket->Socketaddr=clientAddr;
         addEvent(client_fd,EVFILT_READ|EVFILT_WRITE,(void *)client_socket);
-        disableEvent(client_fd,EVFILT_WRITE);
+        //disableEvent(client_fd,EVFILT_WRITE);
         connected(client_socket);
     }
    
@@ -144,8 +166,8 @@ void PTCPServer::accept(struct kevent * ke){
 void PTCPServer::addEvent(int fd,int event,void *dataPtr){
     int ret = 0;
     struct kevent events[1];
-    events[0].udata=dataPtr;
-    EV_SET(&events[0], fd, event, EV_ADD, 0, 0, NULL);
+    //events[0].udata=dataPtr;
+    EV_SET(&events[0], fd, event, EV_ADD, 0, 0, dataPtr);
     ret = kevent(kqueue_handle, events, 1, NULL, 0, NULL);
     if (ret < 0){
          errorL("addEvent:" << strerror(errno));
