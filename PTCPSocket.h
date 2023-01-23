@@ -11,7 +11,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include <arpa/inet.h>
-
+#include "PByteArray.hpp"
 
 class PTCPServer;
 
@@ -44,7 +44,7 @@ SIGNAL_("read or write")
     void send(const char * data,int size);
 
     int read(char * data,int size);
-
+    struct kevent socketEvent;
 private:
     /**
      * @brief 私有信号
@@ -54,20 +54,12 @@ private:
      * @param data 
      * @param size 
      */
-    _SIGNAL(PTCPSocket,writeReady,
-    _ARGS(const char * data,int size),
-    _ARGS(const char *,int ),
-    _ARGS(data,size)
-    )
+    _SIGNAL_VOID(PTCPSocket,writeReady)
 
    
     
 private:
     friend PTCPServer;
-    struct sendCache_t{
-        char * data;
-        int size;
-    };
     struct sockaddr_in Socketaddr;
     /**
      * @brief writeReady的槽函数
@@ -75,8 +67,9 @@ private:
      * @param data 
      * @param size 
      */
-    void onWrite(const char * data,int size);
-    std::vector<sendCache_t> dataCache;
+    void onWrite();
+    PByteArray sendCaceh;
+    PByteArray recaveCaceh;
     int scfd;
     PTCPServer * m_server=nullptr;//kqueue 管理类
 };
@@ -140,18 +133,19 @@ SIGNAL_("connection")
 
 private:
     friend PTCPSocket;
-    void addEvent(int fd,int event,void *dataPtr=nullptr);
+    void addEvent(int fd,int event,struct kevent *e,void *dataPtr=nullptr);
 
-    void deleteEvent(int fd,int event);
+    void deleteEvent(int fd,int event, struct kevent *e);
 
-    void eableEvent(int fd,int event);
+    void eableEvent(int fd,int event, struct kevent *e);
 
-    void disableEvent(int fd,int event);
+    void disableEvent(int fd,int event, struct kevent *e);
 
 private:
     int listen_fd=0; ///监听描述符
     int kqueue_handle=0;   //内核队列描述符
     int MaxEventCheckSize=0; //最大的监听事件数量
+    struct kevent listen_event;
     struct kevent * checkeventList=nullptr; 
 };
 

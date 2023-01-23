@@ -15,7 +15,7 @@
 #define debugL(msg) \
 	std::cout << YELLOW_t <<"debug:["<< __FILE__ << ":"<< __LINE__ << "]:"<< msg << WRITE << std::endl;
 #define infoL(msg) \
-	std::cout << GREEN_t <<"debug:["<< __FILE__ << ":" << __LINE__ << "]:"<< msg << WRITE << std::endl;
+	std::cout << GREEN_t <<"infor:["<< __FILE__ << ":" << __LINE__ << "]:"<< msg << WRITE << std::endl;
 
 #define _S(n) std::to_string(n)
 

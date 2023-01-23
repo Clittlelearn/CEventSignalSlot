@@ -3,6 +3,7 @@
 
 PTCPSocket::PTCPSocket(int fd,PTCPServer * server,PObject * parent):PObject(parent){
     scfd=fd;
+    
     connect(this,&PTCPSocket::writeReady,this,&PTCPSocket::onWrite);
     if(server==nullptr){
         m_server=new PTCPServer(10,this);
@@ -27,18 +28,26 @@ PTCPSocket::~PTCPSocket(){
 }
 
  void PTCPSocket::send(const char * data,int size){
-    writeReady(data,size);
-    m_server->eableEvent(scfd,EVFILT_WRITE);
+    std::unique_lock<std::mutex> locker(cache_lock);
+    sendCaceh.push(data,size);
+    m_server->eableEvent(scfd,EVFILT_WRITE,&socketEvent);
+    writeReady();
  }
 
- void PTCPSocket::onWrite(const char * data,int size){
-    ::send(scfd,data,size ,0);
+ void PTCPSocket::onWrite(){
+    std::unique_lock<std::mutex> locker(cache_lock);
+    char buffer[4096]={0};
+    int ret=0;
+    while(sendCaceh.size()>0){
+       ret=sendCaceh.pop(buffer,4096);
+       ::send(scfd,buffer,ret ,0);
+    }
  }
 
 int PTCPSocket::read(char * data,int size){
     int ret= ::read(scfd,data,size);
     if(ret==0){
-        m_server->deleteEvent(scfd,EVFILT_READ);
+        m_server->deleteEvent(scfd,EVFILT_READ,&socketEvent);
         ::close(scfd);
         scfd=0;
     }
@@ -87,7 +96,7 @@ bool PTCPServer::listen(int MaxListenSize){
         errorL("listen:" << strerror(errno));
         return false;
     }
-    addEvent(listen_fd, EVFILT_READ|EVFILT_WRITE);
+    addEvent(listen_fd, EVFILT_READ|EVFILT_WRITE,&listen_event);
     
     return true;
 }
@@ -124,7 +133,9 @@ void PTCPServer::run(){
 
             else if(checkeventList[i].filter == EVFILT_WRITE)
             {
-               
+               infoL("has writed !!!");
+               struct kevent ne;
+               disableEvent(fd,EVFILT_WRITE,&ne);
             }
             else
             {
@@ -136,7 +147,7 @@ void PTCPServer::run(){
 
 void PTCPServer::exit(){
     PEventLoop::exit();
-    deleteEvent(listen_fd,EVFILT_READ|EVFILT_WRITE);
+    deleteEvent(listen_fd,EVFILT_READ|EVFILT_WRITE,&listen_event);
     
 }
 
@@ -154,8 +165,7 @@ void PTCPServer::accept(struct kevent * ke){
         }
         PTCPSocket * client_socket=new PTCPSocket(client_fd,this,this);
         client_socket->Socketaddr=clientAddr;
-        addEvent(client_fd,EVFILT_READ|EVFILT_WRITE,(void *)client_socket);
-        //disableEvent(client_fd,EVFILT_WRITE);
+        addEvent(client_fd,EVFILT_READ|EVFILT_WRITE,&client_socket->socketEvent,(void *)client_socket);
         connected(client_socket);
     }
    
@@ -163,42 +173,43 @@ void PTCPServer::accept(struct kevent * ke){
 }
 
 
-void PTCPServer::addEvent(int fd,int event,void *dataPtr){
+void PTCPServer::addEvent(int fd,int event, struct kevent *e,void *dataPtr){
     int ret = 0;
-    struct kevent events[1];
-    //events[0].udata=dataPtr;
-    EV_SET(&events[0], fd, event, EV_ADD, 0, 0, dataPtr);
-    ret = kevent(kqueue_handle, events, 1, NULL, 0, NULL);
+   
+    EV_SET(e, fd, event, EV_ADD, 0, 0, dataPtr);
+    ret = kevent(kqueue_handle, e, 1, NULL, 0, NULL);
     if (ret < 0){
          errorL("addEvent:" << strerror(errno));
     }
 }
 
-void PTCPServer::deleteEvent(int fd,int event){
+void PTCPServer::deleteEvent(int fd,int event, struct kevent *e){
     int ret = 0;
-    struct kevent events[1];
-    EV_SET(events, fd, event, EV_DELETE, 0, 0, NULL);
-    ret = kevent(kqueue_handle, events, 1, NULL, 0, NULL);
+    
+    EV_SET(e, fd, event, EV_DELETE, 0, 0, NULL);
+    ret = kevent(kqueue_handle, e, 1, NULL, 0, NULL);
    if (ret < 0){
          errorL("deleteEvent:" << strerror(errno));
     }
 }
 
-void PTCPServer::eableEvent(int fd,int event){
+void PTCPServer::eableEvent(int fd,int event, struct kevent *e){
     int ret = 0;
-    struct kevent events[1];
-    EV_SET(events, fd, event, EV_ENABLE, 0, 0, NULL);
-    ret = kevent(kqueue_handle, events, 1, NULL, 0, NULL);
+   // debugL("file description:" << fd);
+    EV_SET(e, fd, event, EV_ADD|EV_ENABLE, 0, 0, NULL);
+    ret = kevent(kqueue_handle, e, 1, NULL, 0, NULL);
     if (ret < 0){
          errorL("eableEvent:" << strerror(errno));
+         
     }
+    debugL("ret:" << fd);
 }
 
-void PTCPServer::disableEvent(int fd,int event){
+void PTCPServer::disableEvent(int fd,int event, struct kevent *e){
+
     int ret = 0;
-    struct kevent events[1];
-    EV_SET(events, fd, event, EV_DISABLE, 0, 0, NULL);
-    ret = kevent(kqueue_handle, events, 1, NULL, 0, NULL);
+    EV_SET(e, fd, event, EV_DISABLE, 0, 0, NULL);
+    ret = kevent(kqueue_handle, e, 1, NULL, 0, NULL);
     if (ret < 0){
          errorL("disableEvent:" << strerror(errno));
     }
