@@ -1,3 +1,0 @@
-/home/wbl/桌面/Event/CEventSignalSlot/build/CMakeFiles/CEvent.dir
-/home/wbl/桌面/Event/CEventSignalSlot/build/CMakeFiles/edit_cache.dir
-/home/wbl/桌面/Event/CEventSignalSlot/build/CMakeFiles/rebuild_cache.dir

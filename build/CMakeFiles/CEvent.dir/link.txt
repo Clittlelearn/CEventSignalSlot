@@ -1,1 +1,0 @@
-/usr/bin/c++ CMakeFiles/CEvent.dir/main.cpp.o CMakeFiles/CEvent.dir/PObject.cpp.o CMakeFiles/CEvent.dir/EventLoop.cpp.o CMakeFiles/CEvent.dir/PThread.cpp.o CMakeFiles/CEvent.dir/PTimer.cpp.o CMakeFiles/CEvent.dir/PTCPSocket.cpp.o -o CEvent 
