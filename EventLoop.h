@@ -89,7 +89,6 @@ protected:
 		std::priority_queue<PEvent*, std::vector<PEvent*>, Event_compare> LoopEvent;
 
 		std::thread::id work_id;
-		CAS spinLook;
 	};
 
 	CoreData::ptr object_loop=nullptr;

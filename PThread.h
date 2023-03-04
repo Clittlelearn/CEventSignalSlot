@@ -8,7 +8,7 @@
 class PThread:public PObject{
 public:
 
-	PThread(PObject* parent);
+	PThread(PObject* parent=nullptr);
 
 	void start();
 

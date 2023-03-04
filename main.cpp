@@ -15,6 +15,7 @@
 #include "PByteArray.hpp"
 
 #ifdef _WINDWOS
+#elif __LINUX__
 
 #elif __MACH__
 #include <unistd.h>
@@ -25,7 +26,7 @@ int main()
 {
 	PCore core;
 	PTCPServer server(18);
-	server.bind("192.168.234.5",3308);
+	server.bind("192.168.234.129",3309);
 	server.listen(13);
 	infoL("man Thread:" << std::this_thread::get_id());
 	server.connect(&server,&PTCPServer::connected,0x33,[](PTCPSocket *socket){
@@ -41,7 +42,11 @@ int main()
 				socket->send(buffer,ret);
 
 			});
+			socket->connect(socket,&PTCPSocket::disconnected,0x99,[](PTCPSocket * socket){
+				infoL("disconnect:"<< socket->getIp()<< ":" << socket->getPort());
+			});
 	});
+
 
 	server.start();
 

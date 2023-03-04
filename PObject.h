@@ -11,8 +11,10 @@
 
 #if _MSC_VER
 #define PlaceHolder std::_Ph
-#else
+#elif __MACH__
 #define PlaceHolder std::placeholders::__ph
+#elif __linux__
+#define PlaceHolder std::_Placeholder
 #endif
 
 template<int N, int...I>

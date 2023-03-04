@@ -12,7 +12,7 @@ void PThread::run() {
 
 void PThread::start()
 {
-	_th = std::thread([=] {
+	_th = std::thread([this] {
 		moveToThisThread();
 			PCore p;
 			this->started();

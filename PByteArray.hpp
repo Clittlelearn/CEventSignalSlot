@@ -28,7 +28,7 @@ public:
             std::vector<char> &ar = *iter;
             return ar.at(arrayIndex);
         }
-        Index(Index &other)
+        Index(const Index &other)
         {
             bolckIndex = other.bolckIndex;
             arrayIndex = other.arrayIndex;
