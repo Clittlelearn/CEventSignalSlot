@@ -4,6 +4,7 @@
 #include <array>
 #include <vector>
 #include <list>
+#include <string>
 #define P_ARRAY_SIZE 5
 
 class PByteArray
@@ -225,7 +226,7 @@ public:
         size_increase = size_num;
     }
 
-    PByteArray(PByteArray & other){
+    PByteArray(const PByteArray & other){
         this->cache=other.cache;
         this->size_increase=other.size_increase;
         this->begin=Index(other.begin.bolckIndex,other.begin.arrayIndex,&cache,cache.begin(),size_increase);
@@ -238,7 +239,7 @@ public:
         }
     }
 
-    PByteArray & operator=(PByteArray & other){
+    PByteArray & operator=(const PByteArray & other){
         this->cache=other.cache;
         this->size_increase=other.size_increase;
         this->begin=Index(other.begin.bolckIndex,other.begin.arrayIndex,&cache,cache.begin(),size_increase);
@@ -259,6 +260,7 @@ public:
 
     int size()
     {
+        
         int now_size = end - begin;
         int capacity_ = cache.size() * size_increase;
 

@@ -1,0 +1,14 @@
+[
+{
+  "directory": "C:/Users/admin/Desktop/chain/CEventSignalSlot-main/build",
+  "command": "D:\\mingw64\\bin\\c++.exe  @CMakeFiles/CEvent.dir/includes_CXX.rsp -gdwarf-2 -std=c++17 -o CMakeFiles\\CEvent.dir\\main.cpp.obj -c C:\\Users\\admin\\Desktop\\chain\\CEventSignalSlot-main\\main.cpp",
+  "file": "C:/Users/admin/Desktop/chain/CEventSignalSlot-main/main.cpp",
+  "output": "CMakeFiles/CEvent.dir/main.cpp.obj"
+},
+{
+  "directory": "C:/Users/admin/Desktop/chain/CEventSignalSlot-main/build",
+  "command": "D:\\mingw64\\bin\\c++.exe  @CMakeFiles/CEvent.dir/includes_CXX.rsp -gdwarf-2 -std=c++17 -o CMakeFiles\\CEvent.dir\\windows\\PTCPSocket.cpp.obj -c C:\\Users\\admin\\Desktop\\chain\\CEventSignalSlot-main\\windows\\PTCPSocket.cpp",
+  "file": "C:/Users/admin/Desktop/chain/CEventSignalSlot-main/windows/PTCPSocket.cpp",
+  "output": "CMakeFiles/CEvent.dir/windows/PTCPSocket.cpp.obj"
+}
+]

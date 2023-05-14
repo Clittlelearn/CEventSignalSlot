@@ -1,16 +1,39 @@
 ﻿# CMakeList.txt: CEvent 的 CMake 项目，在此处包括源代码并定义
 # 项目特定的逻辑。
 #
-cmake_minimum_required (VERSION 3.8)
+cmake_minimum_required (VERSION 3.0)
 
-project ("CEvent")
 
-add_compile_options("-g")
-# 将源代码添加到此项目的可执行文件。
-add_executable (CEvent  "main.cpp"  "PObject.h" "PObject.cpp" "EventLoop.cpp"   "debug.h" "PThread.h" "PThread.cpp" "PTimer.h" "PTimer.cpp" "CAS.h" "PTCPSocket.cpp")
+project(CEvent)
 
-if (CMAKE_VERSION VERSION_GREATER 3.12)
-  set_property(TARGET CEvent PROPERTY CXX_STANDARD 20)
-endif()
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# TODO: 如有需要，请添加测试并安装 
+add_compile_options(-gdwarf-2 -std=c++17)
+
+
+
+
+
+set(CMAKE_CXX_STANDARD 17)
+#link_directories(${CMAKE_SOURCE_DIR}/lib/protobuf/lib)
+
+include_directories(${CMAKE_SOURCE_DIR}/windows)
+#include_directories(${CMAKE_SOURCE_DIR}/lib/include)
+include_directories(${CMAKE_SOURCE_DIR})
+
+
+
+file(GLOB SOURCE_CODE "windows/*.cpp" "*.cpp"  )
+
+add_executable(${PROJECT_NAME} ${SOURCE_CODE})
+
+
+# add_library(${PROJECT_NAME} SHARED ${SOURCE_CODE})
+
+# target_link_libraries(${PROJECT_NAME} libssl.lib)
+# target_link_libraries(${PROJECT_NAME} libcrypto.lib)
+ #target_link_libraries(${PROJECT_NAME} libprotobuf.a)
+
+ #target_link_libraries(${PROJECT_NAME} libws2_32.lib)
+
+# TOD: 如有需要，请添加测试并安装

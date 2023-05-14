@@ -4,7 +4,9 @@
 
 class CAS {
 public:
-	CAS() = default;
+	CAS() {
+        locker.store(false);
+    }
 
 	CAS(CAS& other) = delete;
 

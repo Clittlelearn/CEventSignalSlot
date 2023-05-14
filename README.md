@@ -21,10 +21,10 @@ just like Qt 5 (Not exactly the same :( , There is no MOC here ha ha ha .....),
 
 But there is no graphical interface
 
-You need to inherit PObject like this:
+You need to inherit Object like this:
 
 ```cpp
-class Widget:public PObject{
+class Widget:public Object{
 public:
     
 };
@@ -33,7 +33,7 @@ public:
 and signal :
 
 ```cpp
-class Widget:public PObject{
+class Widget:public Object{
 public:
     _SIGNAL_VOID(Widget,hello) // this is signal
 
@@ -52,7 +52,7 @@ public:
 and connect:
 
 ```cpp
-class Widget:public PObject{
+class Widget:public Object{
 public:
     Widget(){
         connect(this,&Widget::hello,this,&Widget::world);
