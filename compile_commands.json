@@ -1,14 +1,67 @@
 [
 {
-  "directory": "C:/Users/admin/Desktop/chain/CEventSignalSlot-main/build",
-  "command": "D:\\mingw64\\bin\\c++.exe  @CMakeFiles/CEvent.dir/includes_CXX.rsp -gdwarf-2 -std=c++17 -o CMakeFiles\\CEvent.dir\\main.cpp.obj -c C:\\Users\\admin\\Desktop\\chain\\CEventSignalSlot-main\\main.cpp",
-  "file": "C:/Users/admin/Desktop/chain/CEventSignalSlot-main/main.cpp",
-  "output": "CMakeFiles/CEvent.dir/main.cpp.obj"
+  "directory": "/home/wbl/Documents/CEventSignalSlot-main/build",
+  "command": "/usr/bin/c++  -I/home/wbl/Documents/CEventSignalSlot-main/linux -I/home/wbl/Documents/CEventSignalSlot-main -I/home/wbl/Documents/CEventSignalSlot-main/utils -I/home/wbl/Documents/CEventSignalSlot-main/lib/openssl/include -I/home/wbl/Documents/CEventSignalSlot-main/proto -I/home/wbl/Documents/CEventSignalSlot-main/lib/protobuf/include -gdwarf-2 -std=c++17 -o CMakeFiles/CEvent.dir/BLEventLoop.cpp.o -c /home/wbl/Documents/CEventSignalSlot-main/BLEventLoop.cpp",
+  "file": "/home/wbl/Documents/CEventSignalSlot-main/BLEventLoop.cpp"
 },
 {
-  "directory": "C:/Users/admin/Desktop/chain/CEventSignalSlot-main/build",
-  "command": "D:\\mingw64\\bin\\c++.exe  @CMakeFiles/CEvent.dir/includes_CXX.rsp -gdwarf-2 -std=c++17 -o CMakeFiles\\CEvent.dir\\windows\\PTCPSocket.cpp.obj -c C:\\Users\\admin\\Desktop\\chain\\CEventSignalSlot-main\\windows\\PTCPSocket.cpp",
-  "file": "C:/Users/admin/Desktop/chain/CEventSignalSlot-main/windows/PTCPSocket.cpp",
-  "output": "CMakeFiles/CEvent.dir/windows/PTCPSocket.cpp.obj"
+  "directory": "/home/wbl/Documents/CEventSignalSlot-main/build",
+  "command": "/usr/bin/c++  -I/home/wbl/Documents/CEventSignalSlot-main/linux -I/home/wbl/Documents/CEventSignalSlot-main -I/home/wbl/Documents/CEventSignalSlot-main/utils -I/home/wbl/Documents/CEventSignalSlot-main/lib/openssl/include -I/home/wbl/Documents/CEventSignalSlot-main/proto -I/home/wbl/Documents/CEventSignalSlot-main/lib/protobuf/include -gdwarf-2 -std=c++17 -o CMakeFiles/CEvent.dir/BLThread.cpp.o -c /home/wbl/Documents/CEventSignalSlot-main/BLThread.cpp",
+  "file": "/home/wbl/Documents/CEventSignalSlot-main/BLThread.cpp"
+},
+{
+  "directory": "/home/wbl/Documents/CEventSignalSlot-main/build",
+  "command": "/usr/bin/c++  -I/home/wbl/Documents/CEventSignalSlot-main/linux -I/home/wbl/Documents/CEventSignalSlot-main -I/home/wbl/Documents/CEventSignalSlot-main/utils -I/home/wbl/Documents/CEventSignalSlot-main/lib/openssl/include -I/home/wbl/Documents/CEventSignalSlot-main/proto -I/home/wbl/Documents/CEventSignalSlot-main/lib/protobuf/include -gdwarf-2 -std=c++17 -o CMakeFiles/CEvent.dir/BLTimer.cpp.o -c /home/wbl/Documents/CEventSignalSlot-main/BLTimer.cpp",
+  "file": "/home/wbl/Documents/CEventSignalSlot-main/BLTimer.cpp"
+},
+{
+  "directory": "/home/wbl/Documents/CEventSignalSlot-main/build",
+  "command": "/usr/bin/c++  -I/home/wbl/Documents/CEventSignalSlot-main/linux -I/home/wbl/Documents/CEventSignalSlot-main -I/home/wbl/Documents/CEventSignalSlot-main/utils -I/home/wbl/Documents/CEventSignalSlot-main/lib/openssl/include -I/home/wbl/Documents/CEventSignalSlot-main/proto -I/home/wbl/Documents/CEventSignalSlot-main/lib/protobuf/include -gdwarf-2 -std=c++17 -o CMakeFiles/CEvent.dir/debug.cpp.o -c /home/wbl/Documents/CEventSignalSlot-main/debug.cpp",
+  "file": "/home/wbl/Documents/CEventSignalSlot-main/debug.cpp"
+},
+{
+  "directory": "/home/wbl/Documents/CEventSignalSlot-main/build",
+  "command": "/usr/bin/c++  -I/home/wbl/Documents/CEventSignalSlot-main/linux -I/home/wbl/Documents/CEventSignalSlot-main -I/home/wbl/Documents/CEventSignalSlot-main/utils -I/home/wbl/Documents/CEventSignalSlot-main/lib/openssl/include -I/home/wbl/Documents/CEventSignalSlot-main/proto -I/home/wbl/Documents/CEventSignalSlot-main/lib/protobuf/include -gdwarf-2 -std=c++17 -o CMakeFiles/CEvent.dir/linux/BLLinuxTCPSocket.cpp.o -c /home/wbl/Documents/CEventSignalSlot-main/linux/BLLinuxTCPSocket.cpp",
+  "file": "/home/wbl/Documents/CEventSignalSlot-main/linux/BLLinuxTCPSocket.cpp"
+},
+{
+  "directory": "/home/wbl/Documents/CEventSignalSlot-main/build",
+  "command": "/usr/bin/c++  -I/home/wbl/Documents/CEventSignalSlot-main/linux -I/home/wbl/Documents/CEventSignalSlot-main -I/home/wbl/Documents/CEventSignalSlot-main/utils -I/home/wbl/Documents/CEventSignalSlot-main/lib/openssl/include -I/home/wbl/Documents/CEventSignalSlot-main/proto -I/home/wbl/Documents/CEventSignalSlot-main/lib/protobuf/include -gdwarf-2 -std=c++17 -o CMakeFiles/CEvent.dir/linux/BLP2P.cpp.o -c /home/wbl/Documents/CEventSignalSlot-main/linux/BLP2P.cpp",
+  "file": "/home/wbl/Documents/CEventSignalSlot-main/linux/BLP2P.cpp"
+},
+{
+  "directory": "/home/wbl/Documents/CEventSignalSlot-main/build",
+  "command": "/usr/bin/c++  -I/home/wbl/Documents/CEventSignalSlot-main/linux -I/home/wbl/Documents/CEventSignalSlot-main -I/home/wbl/Documents/CEventSignalSlot-main/utils -I/home/wbl/Documents/CEventSignalSlot-main/lib/openssl/include -I/home/wbl/Documents/CEventSignalSlot-main/proto -I/home/wbl/Documents/CEventSignalSlot-main/lib/protobuf/include -gdwarf-2 -std=c++17 -o CMakeFiles/CEvent.dir/linux/BLTimer.cpp.o -c /home/wbl/Documents/CEventSignalSlot-main/linux/BLTimer.cpp",
+  "file": "/home/wbl/Documents/CEventSignalSlot-main/linux/BLTimer.cpp"
+},
+{
+  "directory": "/home/wbl/Documents/CEventSignalSlot-main/build",
+  "command": "/usr/bin/c++  -I/home/wbl/Documents/CEventSignalSlot-main/linux -I/home/wbl/Documents/CEventSignalSlot-main -I/home/wbl/Documents/CEventSignalSlot-main/utils -I/home/wbl/Documents/CEventSignalSlot-main/lib/openssl/include -I/home/wbl/Documents/CEventSignalSlot-main/proto -I/home/wbl/Documents/CEventSignalSlot-main/lib/protobuf/include -gdwarf-2 -std=c++17 -o CMakeFiles/CEvent.dir/proto/datacode.pb.cc.o -c /home/wbl/Documents/CEventSignalSlot-main/proto/datacode.pb.cc",
+  "file": "/home/wbl/Documents/CEventSignalSlot-main/proto/datacode.pb.cc"
+},
+{
+  "directory": "/home/wbl/Documents/CEventSignalSlot-main/build",
+  "command": "/usr/bin/c++  -I/home/wbl/Documents/CEventSignalSlot-main/linux -I/home/wbl/Documents/CEventSignalSlot-main -I/home/wbl/Documents/CEventSignalSlot-main/utils -I/home/wbl/Documents/CEventSignalSlot-main/lib/openssl/include -I/home/wbl/Documents/CEventSignalSlot-main/proto -I/home/wbl/Documents/CEventSignalSlot-main/lib/protobuf/include -gdwarf-2 -std=c++17 -o CMakeFiles/CEvent.dir/ssl3/ssl.cpp.o -c /home/wbl/Documents/CEventSignalSlot-main/ssl3/ssl.cpp",
+  "file": "/home/wbl/Documents/CEventSignalSlot-main/ssl3/ssl.cpp"
+},
+{
+  "directory": "/home/wbl/Documents/CEventSignalSlot-main/build",
+  "command": "/usr/bin/c++  -I/home/wbl/Documents/CEventSignalSlot-main/linux -I/home/wbl/Documents/CEventSignalSlot-main -I/home/wbl/Documents/CEventSignalSlot-main/utils -I/home/wbl/Documents/CEventSignalSlot-main/lib/openssl/include -I/home/wbl/Documents/CEventSignalSlot-main/proto -I/home/wbl/Documents/CEventSignalSlot-main/lib/protobuf/include -gdwarf-2 -std=c++17 -o CMakeFiles/CEvent.dir/test/FileClass.cpp.o -c /home/wbl/Documents/CEventSignalSlot-main/test/FileClass.cpp",
+  "file": "/home/wbl/Documents/CEventSignalSlot-main/test/FileClass.cpp"
+},
+{
+  "directory": "/home/wbl/Documents/CEventSignalSlot-main/build",
+  "command": "/usr/bin/c++  -I/home/wbl/Documents/CEventSignalSlot-main/linux -I/home/wbl/Documents/CEventSignalSlot-main -I/home/wbl/Documents/CEventSignalSlot-main/utils -I/home/wbl/Documents/CEventSignalSlot-main/lib/openssl/include -I/home/wbl/Documents/CEventSignalSlot-main/proto -I/home/wbl/Documents/CEventSignalSlot-main/lib/protobuf/include -gdwarf-2 -std=c++17 -o CMakeFiles/CEvent.dir/test/argpaser.cpp.o -c /home/wbl/Documents/CEventSignalSlot-main/test/argpaser.cpp",
+  "file": "/home/wbl/Documents/CEventSignalSlot-main/test/argpaser.cpp"
+},
+{
+  "directory": "/home/wbl/Documents/CEventSignalSlot-main/build",
+  "command": "/usr/bin/c++  -I/home/wbl/Documents/CEventSignalSlot-main/linux -I/home/wbl/Documents/CEventSignalSlot-main -I/home/wbl/Documents/CEventSignalSlot-main/utils -I/home/wbl/Documents/CEventSignalSlot-main/lib/openssl/include -I/home/wbl/Documents/CEventSignalSlot-main/proto -I/home/wbl/Documents/CEventSignalSlot-main/lib/protobuf/include -gdwarf-2 -std=c++17 -o CMakeFiles/CEvent.dir/test/main.cpp.o -c /home/wbl/Documents/CEventSignalSlot-main/test/main.cpp",
+  "file": "/home/wbl/Documents/CEventSignalSlot-main/test/main.cpp"
+},
+{
+  "directory": "/home/wbl/Documents/CEventSignalSlot-main/build",
+  "command": "/usr/bin/c++  -I/home/wbl/Documents/CEventSignalSlot-main/linux -I/home/wbl/Documents/CEventSignalSlot-main -I/home/wbl/Documents/CEventSignalSlot-main/utils -I/home/wbl/Documents/CEventSignalSlot-main/lib/openssl/include -I/home/wbl/Documents/CEventSignalSlot-main/proto -I/home/wbl/Documents/CEventSignalSlot-main/lib/protobuf/include -gdwarf-2 -std=c++17 -o CMakeFiles/CEvent.dir/test/package.cpp.o -c /home/wbl/Documents/CEventSignalSlot-main/test/package.cpp",
+  "file": "/home/wbl/Documents/CEventSignalSlot-main/test/package.cpp"
 }
 ]

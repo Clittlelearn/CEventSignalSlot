@@ -69,6 +69,7 @@ class Slot :public Event {
 public:
 	Slot(F&& f, uint64_t s_id) :f_(std::forward<F>(f)) {
 		slot_id = s_id;
+        InvkeCallback=std::bind(&Slot<F, Ts...>::Invke,this);
 	}
 	
 	void addArg(const std::tuple<Ts...> & args_) {
@@ -76,14 +77,13 @@ public:
 	}
 
 
-
-	void Invke()override {
-		spinLock.lock();
-		auto arg=args.front();
-		args.pop();
-		spinLock.unlock();
-		std::apply(f_, arg);
-	}
+     void Invke() {
+	 	spinLock.lock();
+	 	auto arg=args.front();
+	 	args.pop();
+	 	spinLock.unlock();
+ 	    std::apply(f_, arg);
+	 }
 protected:
 	F f_;
 	std::queue<std::tuple<Ts...>> args;
@@ -92,7 +92,7 @@ protected:
 
 class Object:public EventLoop{
 public:
-	Object(Object* parent = nullptr)  {
+	Object()  {
         std::thread::id id = std::this_thread::get_id();
 	    setObjectThread(id);
     }
@@ -112,27 +112,33 @@ class signal_{
     public:
         signal_() = default;
         ~signal_() {
-            for (auto p : slots) {
+            lock.lock();
+            for (auto &p : slots) {
                 delete p.second.second;
             }
-
-            for (auto p : lamda_slots) {
+            for (auto& p : lamda_slots) {
                 delete p.second;
             }
+            lock.unlock();
         }
     template<typename _RT>
 	void connect(Object * threadof,_RT *_OBJ_R,void(_RT::* _SLOT)(ARGS...)){
+          lock.lock();
           Event * sobj=new Slot<std::function<void(ARGS...)> , std::decay_t<ARGS>...>(Bind(_SLOT,_OBJ_R),0);
           long long fid=(long long)supercast<void(*)(ARGS...)>(_SLOT);
           slots[fid]={(Object*)threadof,sobj};
+          lock.unlock();
     }
 
     void connect(Object * ssobj,const std::function<void(ARGS...)> &f){
+         lock.lock();
         Event * sobj=new Slot<std::function<void(ARGS...)> , std::decay_t<ARGS>...>(std::function<void(ARGS...)>(f),0);
         lamda_slots.push_back({(Object*)ssobj,sobj});
+        lock.unlock();
     }
 
-    void emit(ARGS ... args_t){
+    void emit(const ARGS& ... args_t){
+        lock.lock();
         Slot<std::function<void(ARGS...)>, std::decay_t<ARGS>...> * slot=nullptr;
         for(auto s:slots){
             slot=static_cast< Slot<std::function<void(ARGS...)>, std::decay_t<ARGS>...> *>(s.second.second);
@@ -147,33 +153,77 @@ class signal_{
             Object * loop=s.first;
             loop->addToEventLoop(s.second);
         }
+        lock.unlock();
+    }
+
+    void emit(bool flag,const ARGS & ... args_t){
+          lock.lock();
+          Slot<std::function<void(ARGS...)>, std::decay_t<ARGS>...> * slot=nullptr;
+          std::vector< Slot<std::function<void(ARGS...)>, std::decay_t<ARGS>...> * > tslots;
+        for(auto s:slots){
+            tslots.push_back(static_cast< Slot<std::function<void(ARGS...)>, std::decay_t<ARGS>...> *>(s.second.second));
+           
+           
+        }
+        for(auto s:lamda_slots){
+            tslots.push_back(static_cast< Slot<std::function<void(ARGS...)>, std::decay_t<ARGS>...> *>(s.second));
+        }
+        lock.unlock();
+        for(auto s:tslots){
+            s->addArg(std::tuple<std::decay_t<ARGS>...>(args_t...));
+            s->Invke();
+        }
+       
     }
 
    template<typename _RT>
    void disconnect(_RT* _OBJ_S,void(_RT::* _SLOT)(ARGS...)){
-        long long fid=supercast<void(*)(ARGS...)>(_SLOT);
+        lock.lock();
+        long long fid=(long long)supercast<void(*)(ARGS...)>(_SLOT);
         auto iter=slots.find(fid);
         if(iter!=slots.end()){
             delete iter->second.second;
         }
         slots.erase(fid);
+        lock.unlock();
+   }
+   void Clear(){
+        lock.lock();
+        for (auto &p : slots) {
+            delete p.second.second;
+        }
+        for (auto& p : lamda_slots) {
+            delete p.second;
+        }
+        slots.clear();
+        lamda_slots.clear();
+        lock.unlock();
    }
  private:
     std::map<long long ,std::pair<Object*,Event*>> slots;
     std::vector<std::pair<Object*,Event*>> lamda_slots;
+    CAS lock;
 };
 
 
 
-class PCore :public Object 
+class Core :public Object 
 {
 public:
-	PCore() = default;
+	Core() = default;
 };
 
 
 }
 
 #define exegesis(arg)
+
+
+
+template <typename U>
+class Result{
+    public:
+    
+};
 
 #endif // !_Object_M_

@@ -1,6 +1,6 @@
 #include "BLEventLoop.h"
 #include "debug.h"
-
+LOGINSTANCE("loop.log")
 namespace BL {
 std::map<std::thread::id, EventLoop::CoreData::ptr> EventLoop::object_map;
 std::mutex EventLoop::theadIdMutex;
@@ -9,6 +9,7 @@ EventLoop::EventLoop() {
 }
 
 void EventLoop::exec() {
+
     theadIdMutex.lock();
     if (object_loop == nullptr) {
         errorL("object_loop is nullptr");
@@ -29,7 +30,7 @@ void EventLoop::exec() {
             e = coreLoop->LooEvent.top();
             coreLoop->LooEvent.pop();
         }
-        e->Invke();
+        e->InvkeCallback();
     }
 }
 

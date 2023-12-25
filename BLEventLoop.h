@@ -18,7 +18,8 @@ class Event {
   public:
     enum { CUSTM_FUNC = 0, TIMER_FUNC = 1 };
 
-    virtual void Invke() {}
+   // virtual void Invke() {}
+    std::function<void()> InvkeCallback=nullptr;
 
     void setPriority(int Priority_);
     uint64_t slot_id;
@@ -28,7 +29,7 @@ class Event {
     friend EventLoop;
     friend EventCompare;
     std::thread::id thread_id;
-    EventLoop *loopPtr = nullptr;
+  //  EventLoop *loopPtr = nullptr;
     int Priority = 0;
 };
 
@@ -55,9 +56,9 @@ class EventLoop {
     void setObjectThread(const std::thread::id &id);
 
     struct CoreData {
-        CoreData(std::thread::id id) { work_id = id; }
+        CoreData(std::thread::id id) { work_id = id; toExit =false;}
         using ptr = std::shared_ptr<CoreData>;
-        std::atomic<bool> toExit = false; // 队列中是否有事件
+        std::atomic<bool> toExit ; // 队列中是否有事件
         std::mutex LoopMutex;
         std::condition_variable cond_t;
         // std::queue<Event*> LooEvent;

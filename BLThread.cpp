@@ -1,7 +1,7 @@
-
+﻿
 #include "BLThread.h"
 #include "debug.h"
-
+LOGINSTANCE("Thread.log");
 namespace BL {
 
 
@@ -30,7 +30,7 @@ void Thread::start()
                 debugL("try_lock fail");
 			}
 			cond.notify_all();
-			PCore p;
+			Core p;
 			this->started.emit();
 			p.exec();
 		});
